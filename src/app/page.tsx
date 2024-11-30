@@ -12,6 +12,7 @@ export default function Home() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setSearchResults([]);
     getSearchResults(searchQuery).then((results) => {
       console.log('Results:', results);
       setLoading(false);
@@ -36,6 +37,7 @@ export default function Home() {
               </h2>
               <form onSubmit={handleSearch} className="w-full">
                 <div className="flex gap-2">
+                  {/* TODO: Limit character length */}
                   <input
                     type="text"
                     value={searchQuery}
