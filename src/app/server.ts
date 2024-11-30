@@ -231,22 +231,29 @@ export async function getSearchResults(searchQuery: string) {
   return searchResults;
 }
 
-export async function getSentimentAnalysis() {
-  for (const result of searchResults) {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    console.log("Visiting:", result.link);
-    try {
-      await page.goto(result.link);
-      const text = await page.$$eval("p", (elements: any) =>
-        elements.map((el: any) => el.innerText).join(" "),
-      );
-      const resultSentiment = sentiment.analyze(text);
-      console.log("Sentiment:", resultSentiment);
-    } catch (error) {
-      console.error("Error visiting page:", error);
-    } finally {
-      await browser.close();
-    }
-  }
+export async function getSentimentAnalysis(article: SearchResult) {
+	const browser = await puppeteer.launch();
+	const page = await browser.newPage();
+	console.log("Visiting:", article.link);
+	try {
+		await page.goto(article.link);
+		const text = await page.$$eval("p", (elements: any) =>
+			elements.map((el: any) => el.innerText).join(" "),
+		);
+		const resultSentiment = sentiment.analyze(text);
+		console.log("Sentiment:", resultSentiment);
+		return interpretSentiment(resultSentiment.score)
+	} catch (error) {
+		console.error("Error visiting page:", error);
+	} finally {
+		await browser.close();
+	}
+}
+
+function interpretSentiment(score: number) {
+  if (score > 0.5) return "Strongly Positive";
+  if (score > 0) return "Positive";
+  if (score === 0) return "Neutral";
+  if (score > -0.5) return "Negative";
+  return "Strongly Negative";
 }

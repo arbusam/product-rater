@@ -22,7 +22,18 @@ export default function Home() {
           return;
         }
         setSearchResults(results);
-        getSentimentAnalysis();
+        for (const result of results) {
+          getSentimentAnalysis(result).then(
+            (sentiment) => {
+              console.log("Sentiment:", sentiment);
+              result.sentiment = sentiment;
+              setSearchResults([...searchResults]);
+            },
+            (error) => {
+              console.error("Error:", error);
+            },
+          );
+        }
       },
       (error) => {
         console.error("Error:", error);
@@ -100,7 +111,10 @@ export default function Home() {
                         >
                           {result.publication}
                         </a>
-                        : {result.title}
+                        : {result.title}{" "}
+                        {result.sentiment != null
+                          ? `| (${result.sentiment})`
+                          : ""}
                       </li>
                     ))}
                   </ul>
