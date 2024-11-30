@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getSearchResults } from "./server";
+import { SearchResult } from "@/types/searchResult";
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -13,6 +15,7 @@ export default function Home() {
     getSearchResults(searchQuery).then((results) => {
       console.log('Results:', results);
       setLoading(false);
+      setSearchResults(results);
     }, (error) => {
       console.error('Error:', error);
       setLoading(false);
@@ -43,7 +46,7 @@ export default function Home() {
                   <button
                     type="submit"
                     className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                  >
+                    disabled={loading}                  >
                     {loading ? (
                       <div role="status">
                           <svg aria-hidden="true" role="status" className="inline w-4 h-4 me-3 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -58,7 +61,19 @@ export default function Home() {
                 </div>
               </form>
               {/* TODO: Add Skeleton Loader */}
-              <h2 className="text-lg font-bold mt-8">Reviews from: {(
+              <h2 className="text-lg font-semibold mt-8">Reviews from: { searchResults.length > 0 ? (
+                <ul className="list-disc list-inside">
+                  {searchResults.map((result) => (
+                    <li key={result.link}>
+                      <a href={result.link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                        {result.publication}
+                      </a>
+                      : {result.title}
+                    </li>
+                  ))}
+                </ul>
+              )
+              : (
                 <div role="status" className="max-w-sm animate-pulse">
                     <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-24 mb-4"></div>
                     <span className="sr-only">Loading...</span>
