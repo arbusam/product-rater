@@ -2,8 +2,6 @@
 
 import { SearchResult } from "@/types/searchResult";
 const puppeteer = require("puppeteer");
-const Sentiment = require("sentiment");
-const sentiment = new Sentiment();
 
 const {
   GoogleGenerativeAI,
@@ -232,28 +230,65 @@ export async function getSearchResults(searchQuery: string) {
 }
 
 export async function getSentimentAnalysis(article: SearchResult) {
-	const browser = await puppeteer.launch();
-	const page = await browser.newPage();
-	console.log("Visiting:", article.link);
-	try {
-		await page.goto(article.link);
-		const text = await page.$$eval("p", (elements: any) =>
-			elements.map((el: any) => el.innerText).join(" "),
-		);
-		const resultSentiment = sentiment.analyze(text);
-		console.log("Sentiment:", resultSentiment);
-		return interpretSentiment(resultSentiment.score)
-	} catch (error) {
-		console.error("Error visiting page:", error);
-	} finally {
-		await browser.close();
-	}
-}
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.goto(article.link);
+  const text: string = await page.$eval("*", (el: Element) => el.textContent || "");
+  await browser.close();
 
-function interpretSentiment(score: number) {
-  if (score > 0.5) return "Strongly Positive";
-  if (score > 0) return "Positive";
-  if (score === 0) return "Neutral";
-  if (score > -0.5) return "Negative";
-  return "Strongly Negative";
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+  });
+
+  const generationConfig = {
+    temperature: 0,
+    topP: 0.95,
+    topK: 40,
+    maxOutputTokens: 2,
+    responseMimeType: "text/plain",
+  };
+  const chatSession = model.startChat({
+    generationConfig,
+    history: [
+      {
+        role: "user",
+        parts: [
+          {text: "Analyze the sentiment of the following text and classify them as POSITIVE, NEGATIVE, or NEUTRAL. \"It's so beautiful today!\""},
+        ],
+      },
+      {
+        role: "model",
+        parts: [
+          {text: "POSITIVE\n"},
+        ],
+      },
+      {
+        role: "user",
+        parts: [
+          {text: "\"It's so cold today I can't feel my feet...\""},
+        ],
+      },
+      {
+        role: "model",
+        parts: [
+          {text: "NEGATIVE"},
+        ],
+      },
+      {
+        role: "user",
+        parts: [
+          {text: "\"The weather today is perfectly adequate.\""},
+        ],
+      },
+      {
+        role: "model",
+        parts: [
+          {text: "NEUTRAL\n"},
+        ],
+      },
+    ],
+  });
+
+  const result = await chatSession.sendMessage(text);
+  return result;
 }

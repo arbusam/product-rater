@@ -15,7 +15,6 @@
     "puppeteer": "^23.9.0",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-dom": "19.0.0-rc-66855b96-20241106",
-    "sentiment": "^5.0.2",
     "serpapi": "^2.1.0"
   },
   "devDependencies": {

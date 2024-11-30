@@ -17,7 +17,7 @@ export default function Home() {
       (results) => {
         console.log("Results:", results);
         setLoading(false);
-        if (searchResults.length === 0) {
+        if (results.length === 0) {
           console.log("No results found");
           return;
         }
@@ -62,7 +62,7 @@ export default function Home() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Enter a tech product"
-                    className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500"
+                    className="flex-1 px-4 py-2 rounded-lg border bg-gray-50 border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
                   <button
                     type="submit"
