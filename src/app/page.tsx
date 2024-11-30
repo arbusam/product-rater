@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
 import { useEffect, useState } from "react";
-import { getSearchResults } from "./server";
+import { getSearchResults, getSentimentAnalysis } from "./server";
 import { SearchResult } from "@/types/searchResult";
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 
@@ -13,14 +13,22 @@ export default function Home() {
     e.preventDefault();
     setLoading(true);
     setSearchResults([]);
-    getSearchResults(searchQuery).then((results) => {
-      console.log('Results:', results);
-      setLoading(false);
-      setSearchResults(results);
-    }, (error) => {
-      console.error('Error:', error);
-      setLoading(false);
-    });
+    getSearchResults(searchQuery).then(
+      (results) => {
+        console.log("Results:", results);
+        setLoading(false);
+        if (searchResults.length === 0) {
+          console.log("No results found");
+          return;
+        }
+        setSearchResults(results);
+        getSentimentAnalysis();
+      },
+      (error) => {
+        console.error("Error:", error);
+        setLoading(false);
+      },
+    );
   };
 
   return (
@@ -48,39 +56,62 @@ export default function Home() {
                   <button
                     type="submit"
                     className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                    disabled={loading}                  >
+                    disabled={loading}
+                  >
                     {loading ? (
                       <div role="status">
-                          <svg aria-hidden="true" role="status" className="inline w-4 h-4 me-3 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="#E5E7EB"/>
-                            <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentColor"/>
-                          </svg>
-                          Analysing...
+                        <svg
+                          aria-hidden="true"
+                          role="status"
+                          className="inline w-4 h-4 me-3 text-white animate-spin"
+                          viewBox="0 0 100 101"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                            fill="#E5E7EB"
+                          />
+                          <path
+                            d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                        Analysing...
                       </div>
-                    ) :
-                      'Analyse'}
+                    ) : (
+                      "Analyse"
+                    )}
                   </button>
                 </div>
               </form>
               {/* TODO: Add Skeleton Loader */}
-              <h2 className="text-lg font-semibold mt-8">Reviews from: { searchResults.length > 0 ? (
-                <ul className="list-disc list-inside">
-                  {searchResults.map((result) => (
-                    <li key={result.link}>
-                      <a href={result.link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
-                        {result.publication}
-                      </a>
-                      : {result.title}
-                    </li>
-                  ))}
-                </ul>
-              )
-              : (
-                <div role="status" className="max-w-sm animate-pulse">
+              <h2 className="text-lg font-semibold mt-8">
+                Reviews from:{" "}
+                {searchResults.length > 0 ? (
+                  <ul className="list-disc list-inside">
+                    {searchResults.map((result) => (
+                      <li key={result.link}>
+                        <a
+                          href={result.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 hover:underline"
+                        >
+                          {result.publication}
+                        </a>
+                        : {result.title}
+                      </li>
+                    ))}
+                  </ul>
+                ) : loading ? (
+                  <div role="status" className="max-w-sm animate-pulse">
                     <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-24 mb-4"></div>
                     <span className="sr-only">Loading...</span>
-                </div>
-              )}
+                  </div>
+                ) : (
+                  <span>No reviews found</span>
+                )}
               </h2>
             </div>
           </div>
@@ -89,7 +120,8 @@ export default function Home() {
         <footer className="mt-8 w-full bg-gray-100 px-4 py-5 dark:bg-gray-700">
           <div className="flex flex-col items-center justify-between space-y-4 md:flex-row md:space-y-0">
             <span className="text-sm text-gray-500 dark:text-gray-300">
-              © 2024 <a href="https://flowbite.com/">Arhan Busam</a>. All Rights Reserved.
+              © 2024 <a href="https://flowbite.com/">Arhan Busam</a>. All
+              Rights Reserved.
             </span>
             <div className="flex space-x-5 rtl:space-x-reverse">
               <a

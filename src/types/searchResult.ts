@@ -1,5 +1,5 @@
 export interface SearchResult {
-    publication: string;
-    title: string;
-    link: string;
+  publication: string;
+  title: string;
+  link: string;
 }
