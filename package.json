@@ -9,10 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@extractus/article-extractor": "^8.0.16",
     "@google/generative-ai": "^0.21.0",
+    "@types/cheerio": "^0.22.35",
+    "@types/node-fetch": "^2.6.12",
+    "cheerio": "^1.0.0",
     "natural": "^8.0.1",
     "next": "15.0.3",
-    "puppeteer": "^23.9.0",
+    "node-fetch": "^3.3.2",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-dom": "19.0.0-rc-66855b96-20241106",
     "serpapi": "^2.1.0"

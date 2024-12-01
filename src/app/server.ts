@@ -1,7 +1,27 @@
 "use server";
 
 import { SearchResult } from "@/types/searchResult";
-const puppeteer = require("puppeteer");
+import * as cheerio from 'cheerio';
+
+const excludeSelectors = [
+  'nav', 
+  'header', 
+  'footer', 
+  'script', 
+  'style', 
+  '.advertisement', 
+  '.ad', 
+  '.sidebar'
+];
+
+const contentSelectors = [
+  'article',
+  'main',
+  '.article-content',
+  '.post-content',
+  '#main-content',
+  'div.content'
+];
 
 const {
   GoogleGenerativeAI,
@@ -230,11 +250,23 @@ export async function getSearchResults(searchQuery: string) {
 }
 
 export async function getSentimentAnalysis(article: SearchResult) {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.goto(article.link);
-  const text: string = await page.$eval("*", (el: Element) => el.textContent || "");
-  await browser.close();
+  "use server";
+  const response = await fetch(article.link);
+  const html = await response.text();
+  const $ = cheerio.load(html);
+
+  excludeSelectors.forEach(selector => $(selector).remove());
+
+  let extractedText = '';
+  for (const selector of contentSelectors) {
+    const content = $(selector).text().trim();
+    if (content) {
+      extractedText = content;
+      break;
+    }
+  }
+  extractedText = cleanText(extractedText);
+  console.log("Text:", extractedText);
 
   const model = genAI.getGenerativeModel({
     model: "gemini-1.5-flash",
@@ -253,7 +285,7 @@ export async function getSentimentAnalysis(article: SearchResult) {
       {
         role: "user",
         parts: [
-          {text: "Analyze the sentiment of the following text and classify them as POSITIVE, NEGATIVE, or NEUTRAL. \"It's so beautiful today!\""},
+          {text: "Analyze the sentiment of the following text and classify them as POSITIVE, NEGATIVE, or NEUTRAL. Always respond with one word only. \"It's so beautiful today!\""},
         ],
       },
       {
@@ -289,6 +321,15 @@ export async function getSentimentAnalysis(article: SearchResult) {
     ],
   });
 
-  const result = await chatSession.sendMessage(text);
-  return result;
+  const result = await chatSession.sendMessage(extractedText);
+  console.log("Sentiment:", result.response.text());
+  return result.response.text();
+}
+
+function cleanText(text: string): string {
+  text = text.replace(/\s+/g, ' ').trim();
+
+  text = text.replace(/[\x00-\x1F\x7F]/g, '');
+
+  return text;
 }
