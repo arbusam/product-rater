@@ -15,19 +15,16 @@ export default function Home() {
     setSearchResults([]);
     getSearchResults(searchQuery).then(
       (results) => {
-        console.log("Results:", results);
         setLoading(false);
         if (results.length === 0) {
-          console.log("No results found");
           return;
         }
         setSearchResults(results);
         for (const result of results) {
           getSentimentAnalysis(result).then(
             (sentiment) => {
-              console.log("Sentiment:", sentiment);
               result.sentiment = sentiment;
-              setSearchResults([...searchResults]);
+              setSearchResults([...results]);
             },
             (error) => {
               console.error("Error:", error);
@@ -97,7 +94,7 @@ export default function Home() {
                 </div>
               </form>
               {/* TODO: Add Skeleton Loader */}
-              <h2 className="text-lg font-semibold mt-8">
+              <h2 className="text-base font-semibold mt-8">
                 Reviews from:{" "}
                 {searchResults.length > 0 ? (
                   <ul className="list-disc list-inside">

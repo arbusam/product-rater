@@ -266,7 +266,6 @@ export async function getSentimentAnalysis(article: SearchResult) {
     }
   }
   extractedText = cleanText(extractedText);
-  console.log("Text:", extractedText);
 
   const model = genAI.getGenerativeModel({
     model: "gemini-1.5-flash",
