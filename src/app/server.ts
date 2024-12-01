@@ -367,7 +367,7 @@ export async function getProsAndCons(articles: string[], searchQuery: string) {
     {
       role: "user",
       parts: [...articles.map(article => ({text: article})), 
-        {text: "Based on these articles, assess the pros and cons of the M4 Mac Mini"},
+        {text:`"Based on these articles, assess the pros and cons of the ${searchQuery}"`},
       ],
     },
   ]

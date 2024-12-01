@@ -11,9 +11,11 @@ export default function Home() {
   const [articleTexts, setArticleTexts] = useState<string[]>([]);
   const [pros, setPros] = useState<string[]>(["pro1", "pro2", "pro3"]);
   const [cons, setCons] = useState<string[]>(["con1", "con2", "con3"]);
+  const [searched, setSearched] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setSearched(true);
     setLoading(true);
     setSearchResults([]);
     setArticleTexts([]);
@@ -116,75 +118,79 @@ export default function Home() {
                   </button>
                 </div>
               </form>
-              {/* TODO: Add Skeleton Loader */}
-              <h2 className="text-base font-semibold mt-8">
-                Reviews from:{" "}
-                {searchResults.length > 0 ? (
-                  <ul className="list-disc list-inside">
-                    {searchResults.map((result) => (
-                      <li key={result.link}>
-                        <a
-                          href={result.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 hover:underline"
-                        >
-                          {result.publication}
-                        </a>
-                        : {result.title}{" "}
-                        {result.sentiment != null
-                          ? <p className={
-                            result.sentiment === "POSITIVE"
-                              ? "text-green-500"
-                              : result.sentiment === "NEGATIVE"
-                              ? "text-red-500"
-                              : result.sentiment === "NEUTRAL"
-                              ? "text-gray-500"
-                              : result.sentiment === "MIXED"
-                              ? "text-yellow-500"
-                              : "text-gray-500"
-                          }>({result.sentiment})</p>
-                          : <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[50px] mb-2.5"></div>}
-                      </li>
-                    ))}
-                  </ul>
-                ) : loading ? (
-                  <div role="status" className="max-w-sm animate-pulse">
-                    <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-24 mb-4"></div>
-                    <span className="sr-only">Loading...</span>
-                  </div>
-                ) : (
-                  <span>No reviews found</span>
-                )}
-              </h2>
-              <div className="mt-6" />
-              <h2 className="text-base font-semibold mt-8">Pros and Cons</h2>
-              <table className="table-fixed w-full mt-2">
-                <thead>
-                  <tr>
-                    <th className="text-left">Pros</th>
-                    <th className="text-left">Cons</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <ul>
-                        {pros.map((pro, index) => (
-                          <li key={index}>{pro}</li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td>
-                      <ul>
-                        {cons.map((con, index) => (
-                          <li key={index}>{con}</li>
-                        ))}
-                      </ul>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              {searched && (
+              <div>
+                {/* TODO: Add Skeleton Loader */}
+                <h2 className="text-base font-semibold mt-8">
+                  Reviews from:{" "}
+                  {searchResults.length > 0 ? (
+                    <ul className="list-disc list-inside">
+                      {searchResults.map((result) => (
+                        <li key={result.link}>
+                          <a
+                            href={result.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 hover:underline"
+                          >
+                            {result.publication}
+                          </a>
+                          : {result.title}{" "}
+                          {result.sentiment != null
+                            ? <p className={
+                              result.sentiment === "POSITIVE"
+                                ? "text-green-500"
+                                : result.sentiment === "NEGATIVE"
+                                ? "text-red-500"
+                                : result.sentiment === "NEUTRAL"
+                                ? "text-gray-500"
+                                : result.sentiment === "MIXED"
+                                ? "text-yellow-500"
+                                : "text-gray-500"
+                            }>({result.sentiment})</p>
+                            : <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[50px] mb-2.5"></div>}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : loading ? (
+                    <div role="status" className="max-w-sm animate-pulse">
+                      <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-24 mb-4"></div>
+                      <span className="sr-only">Loading...</span>
+                    </div>
+                  ) : (
+                    <span>No reviews found</span>
+                  )}
+                </h2>
+                <div className="mt-6" />
+                <h2 className="text-base font-semibold mt-8">Pros and Cons</h2>
+                <table className="table-fixed w-full mt-2">
+                  <thead>
+                    <tr>
+                      <th className="text-left">Pros</th>
+                      <th className="text-left">Cons</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <ul className="list-disc list-inside">
+                          {pros.map((pro, index) => (
+                            <li key={index}>{pro}</li>
+                          ))}
+                        </ul>
+                      </td>
+                      <td>
+                        <ul className="list-disc list-inside">
+                          {cons.map((con, index) => (
+                            <li key={index}>{con}</li>
+                          ))}
+                        </ul>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              )}
             </div>
           </div>
         </main>
