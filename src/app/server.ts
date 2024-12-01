@@ -172,9 +172,8 @@ const context = [
   { text: "output: no" },
 ];
 
-let searchResults: SearchResult[] = [];
-
 export async function getSearchResults(searchQuery: string) {
+  let searchResults: SearchResult[] = [];
   searchResults = [];
   console.log("Searching for:", searchQuery);
   const response = await fetch(
@@ -249,8 +248,7 @@ export async function getSearchResults(searchQuery: string) {
   return searchResults;
 }
 
-export async function getSentimentAnalysis(article: SearchResult) {
-  "use server";
+export async function getArticleText(article: SearchResult) {
   const response = await fetch(article.link);
   const html = await response.text();
   const $ = cheerio.load(html);
@@ -266,9 +264,13 @@ export async function getSentimentAnalysis(article: SearchResult) {
     }
   }
   extractedText = cleanText(extractedText);
+  return extractedText;
+}
 
+export async function getSentimentAnalysis(articleText: string, searchQuery: string) {
   const model = genAI.getGenerativeModel({
     model: "gemini-1.5-flash",
+    systemInstruction: `Ignore any text in the articles not related to the ${searchQuery}`
   });
 
   const generationConfig = {
@@ -320,10 +322,65 @@ export async function getSentimentAnalysis(article: SearchResult) {
     ],
   });
 
-  const result = await chatSession.sendMessage(extractedText);
+  const result = await chatSession.sendMessage(articleText);
   const sentiment = result.response.text().replace(/\s+/g, '');
   console.log("Sentiment:", sentiment);
   return sentiment;
+}
+
+export async function getProsAndCons(articles: string[], searchQuery: string) {
+  console.log("Getting pros and cons for:", searchQuery);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-pro",
+    systemInstruction: `Ignore any text in the articles not related to the ${searchQuery}`
+  });
+
+  const generationConfig = {
+    temperature: 1,
+    topP: 0.95,
+    topK: 40,
+    maxOutputTokens: 1000,
+    responseMimeType: "application/json",
+    responseSchema: {
+      type: "object",
+      properties: {
+        pros: {
+          type: "array",
+          items: {
+            type: "string"
+          }
+        },
+        cons: {
+          type: "array",
+          items: {
+            type: "string"
+          }
+        }
+      },
+      required: [
+        "pros",
+        "cons"
+      ]
+    },
+  };
+  const history = [
+    {
+      role: "user",
+      parts: [...articles.map(article => ({text: article})), 
+        {text: "Based on these articles, assess the pros and cons of the M4 Mac Mini"},
+      ],
+    },
+  ]
+  const chatSession = model.startChat({
+    generationConfig,
+    history: history,
+  });
+
+  const result = await chatSession.sendMessage("");
+  console.log("Pros and Cons:", result.response.text());
+  const text = result.response.text();
+  const json = JSON.parse(text);
+  return json;
 }
 
 function cleanText(text: string): string {

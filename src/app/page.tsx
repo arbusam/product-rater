@@ -1,18 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getSearchResults, getSentimentAnalysis } from "./server";
+import { use, useEffect, useState } from "react";
+import { getSearchResults, getSentimentAnalysis, getArticleText, getProsAndCons } from "./server";
 import { SearchResult } from "@/types/searchResult";
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [articleTexts, setArticleTexts] = useState<string[]>([]);
+  const [pros, setPros] = useState<string[]>(["pro1", "pro2", "pro3"]);
+  const [cons, setCons] = useState<string[]>(["con1", "con2", "con3"]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setSearchResults([]);
+    setArticleTexts([]);
     getSearchResults(searchQuery).then(
       (results) => {
         setLoading(false);
@@ -21,15 +25,34 @@ export default function Home() {
         }
         setSearchResults(results);
         for (const result of results) {
-          getSentimentAnalysis(result).then(
-            (sentiment) => {
-              result.sentiment = sentiment;
-              setSearchResults([...results]);
-            },
-            (error) => {
-              console.error("Error:", error);
-            },
-          );
+          getArticleText(result).then(
+            (text) => {
+              articleTexts.push(text);
+              getSentimentAnalysis(text, searchQuery).then(
+                (sentiment) => {
+                  result.sentiment = sentiment;
+                  setSearchResults([...results]);
+                },
+                (error) => {
+                  console.error("Error:", error);
+                },
+              );
+              console.log(articleTexts, articleTexts.length, results.length);
+              if (articleTexts.length !== results.length) {
+                return;
+              }
+
+              getProsAndCons(articleTexts, searchQuery).then(
+                (prosAndCons) => {
+                  setPros(prosAndCons.pros);
+                  setCons(prosAndCons.cons);
+                  console.log(prosAndCons.pros, prosAndCons.cons);
+                },
+                (error) => {
+                  console.error("Error:", error);
+                },
+              );
+            });
         }
       },
       (error) => {
@@ -134,6 +157,34 @@ export default function Home() {
                   <span>No reviews found</span>
                 )}
               </h2>
+              <div className="mt-6" />
+              <h2 className="text-base font-semibold mt-8">Pros and Cons</h2>
+              <table className="table-fixed w-full mt-2">
+                <thead>
+                  <tr>
+                    <th className="text-left">Pros</th>
+                    <th className="text-left">Cons</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <ul>
+                        {pros.map((pro, index) => (
+                          <li key={index}>{pro}</li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td>
+                      <ul>
+                        {cons.map((con, index) => (
+                          <li key={index}>{con}</li>
+                        ))}
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </main>
