@@ -290,7 +290,7 @@ export async function getSentimentAnalysis(article: SearchResult) {
       {
         role: "model",
         parts: [
-          {text: "POSITIVE\n"},
+          {text: "POSITIVE"},
         ],
       },
       {
@@ -314,15 +314,16 @@ export async function getSentimentAnalysis(article: SearchResult) {
       {
         role: "model",
         parts: [
-          {text: "NEUTRAL\n"},
+          {text: "NEUTRAL"},
         ],
       },
     ],
   });
 
   const result = await chatSession.sendMessage(extractedText);
-  console.log("Sentiment:", result.response.text());
-  return result.response.text();
+  const sentiment = result.response.text().replace(/\s+/g, '');
+  console.log("Sentiment:", sentiment);
+  return sentiment;
 }
 
 function cleanText(text: string): string {

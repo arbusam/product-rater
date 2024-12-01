@@ -110,8 +110,18 @@ export default function Home() {
                         </a>
                         : {result.title}{" "}
                         {result.sentiment != null
-                          ? `| (${result.sentiment})`
-                          : ""}
+                          ? <p className={
+                            result.sentiment === "POSITIVE"
+                              ? "text-green-500"
+                              : result.sentiment === "NEGATIVE"
+                              ? "text-red-500"
+                              : result.sentiment === "NEUTRAL"
+                              ? "text-gray-500"
+                              : result.sentiment === "MIXED"
+                              ? "text-yellow-500"
+                              : "text-gray-500"
+                          }>({result.sentiment})</p>
+                          : <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[50px] mb-2.5"></div>}
                       </li>
                     ))}
                   </ul>
