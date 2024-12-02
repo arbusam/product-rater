@@ -9,8 +9,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [articleTexts, setArticleTexts] = useState<string[]>([]);
-  const [pros, setPros] = useState<string[]>(["pro1", "pro2", "pro3"]);
-  const [cons, setCons] = useState<string[]>(["con1", "con2", "con3"]);
+  const [pros, setPros] = useState<string[]>([]);
+  const [cons, setCons] = useState<string[]>([]);
   const [searched, setSearched] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -162,16 +162,38 @@ export default function Home() {
                   )}
                 </h2>
                 <div className="mt-6" />
-                <h2 className="text-base font-semibold mt-8">Pros and Cons</h2>
+                <h2 className="text-xl font-bold mt-8">Pros and Cons:</h2>
                 <table className="table-fixed w-full mt-2">
                   <thead>
                     <tr>
-                      <th className="text-left">Pros</th>
-                      <th className="text-left">Cons</th>
+                      <th className="text-left text-lg">Pros</th>
+                      <th className="text-left text-lg">Cons</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
+                    {pros.length === 0 && cons.length === 0 && loading ? (
+                      <tr>
+                        <td>
+                          <ul className="list-disc list-inside">
+                            <div role="status" className="max-w-sm animate-pulse">
+                              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
+                              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
+                              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
+                            </div>
+                          </ul>
+                        </td>
+                        <td>
+                          <ul className="list-disc list-inside">
+                            <div role="status" className="max-w-sm animate-pulse">
+                              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
+                              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
+                              <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
+                            </div>
+                          </ul>
+                        </td>
+                      </tr>
+                    )
+                    : (<tr>
                       <td>
                         <ul className="list-disc list-inside">
                           {pros.map((pro, index) => (
@@ -186,7 +208,7 @@ export default function Home() {
                           ))}
                         </ul>
                       </td>
-                    </tr>
+                    </tr>)}
                   </tbody>
                 </table>
               </div>
