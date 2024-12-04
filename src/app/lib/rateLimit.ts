@@ -14,7 +14,6 @@ export async function rateLimit(request: NextRequest) {
     "127.0.0.1";
   const cleanIp = ip.split(",")[0];
 
-  const now = Date.now();
   const windowMs = 60 * 1000;
   const limit = 100;
 

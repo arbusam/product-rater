@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { SearchResult } from "@/types/searchResult";
-import { load } from "cheerio";
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
