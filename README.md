@@ -4,6 +4,8 @@ https://product-rater.vercel.app/
 
 This is a website that gathers reviews from trusted sources online to present to you, as well as analysing how they feel about the product and what its overall pros and cons are.
 
+https://github.com/user-attachments/assets/d3131399-b01e-4f79-9417-aaf72356f6f7
+
 ## Installation
 
 If you wish to run this on your own computer, follow these steps:
