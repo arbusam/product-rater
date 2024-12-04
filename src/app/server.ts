@@ -23,12 +23,11 @@ const contentSelectors = [
   "div.content",
 ];
 
-const {
-  GoogleGenerativeAI,
-  HarmCategory,
-  HarmBlockThreshold,
-} = require("@google/generative-ai");
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 
+if (!process.env.GEMINI_API_KEY) {
+  throw new Error("GEMINI_API_KEY is not defined");
+}
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const context = [
@@ -339,18 +338,18 @@ export async function getProsAndCons(articles: string[], searchQuery: string) {
     maxOutputTokens: 1000,
     responseMimeType: "application/json",
     responseSchema: {
-      type: "object",
+      type: SchemaType.OBJECT,
       properties: {
         pros: {
-          type: "array",
+          type: SchemaType.ARRAY,
           items: {
-            type: "string",
+            type: SchemaType.STRING,
           },
         },
         cons: {
-          type: "array",
+          type: SchemaType.ARRAY,
           items: {
-            type: "string",
+            type: SchemaType.STRING,
           },
         },
       },
