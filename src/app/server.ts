@@ -1,26 +1,26 @@
 "use server";
 
 import { SearchResult } from "@/types/searchResult";
-import * as cheerio from 'cheerio';
+import * as cheerio from "cheerio";
 
 const excludeSelectors = [
-  'nav', 
-  'header', 
-  'footer', 
-  'script', 
-  'style', 
-  '.advertisement', 
-  '.ad', 
-  '.sidebar'
+  "nav",
+  "header",
+  "footer",
+  "script",
+  "style",
+  ".advertisement",
+  ".ad",
+  ".sidebar",
 ];
 
 const contentSelectors = [
-  'article',
-  'main',
-  '.article-content',
-  '.post-content',
-  '#main-content',
-  'div.content'
+  "article",
+  "main",
+  ".article-content",
+  ".post-content",
+  "#main-content",
+  "div.content",
 ];
 
 const {
@@ -233,6 +233,8 @@ export async function getSearchResults(searchQuery: string) {
       publication = "Digital Trends";
     } else if (item.displayLink.includes("techcrunch")) {
       publication = "TechCrunch";
+    } else if (item.displayLink.includes("tomsguide")) {
+      publication = "Tom's Guide";
     } else {
       publication = item.displayLink;
     }
@@ -253,9 +255,9 @@ export async function getArticleText(article: SearchResult) {
   const html = await response.text();
   const $ = cheerio.load(html);
 
-  excludeSelectors.forEach(selector => $(selector).remove());
+  excludeSelectors.forEach((selector) => $(selector).remove());
 
-  let extractedText = '';
+  let extractedText = "";
   for (const selector of contentSelectors) {
     const content = $(selector).text().trim();
     if (content) {
@@ -267,10 +269,13 @@ export async function getArticleText(article: SearchResult) {
   return extractedText;
 }
 
-export async function getSentimentAnalysis(articleText: string, searchQuery: string) {
+export async function getSentimentAnalysis(
+  articleText: string,
+  searchQuery: string,
+) {
   const model = genAI.getGenerativeModel({
     model: "gemini-1.5-flash",
-    systemInstruction: `Ignore any text in the articles not related to the ${searchQuery}`
+    systemInstruction: `Ignore any text in the articles not related to the ${searchQuery}`,
   });
 
   const generationConfig = {
@@ -286,44 +291,36 @@ export async function getSentimentAnalysis(articleText: string, searchQuery: str
       {
         role: "user",
         parts: [
-          {text: "Analyze the sentiment of the following text and classify them as POSITIVE, NEGATIVE, or NEUTRAL. Always respond with one word only. \"It's so beautiful today!\""},
+          {
+            text: 'Analyze the sentiment of the following text and classify them as POSITIVE, NEGATIVE, or NEUTRAL. Always respond with one word only. "It\'s so beautiful today!"',
+          },
         ],
       },
       {
         role: "model",
-        parts: [
-          {text: "POSITIVE"},
-        ],
+        parts: [{ text: "POSITIVE" }],
       },
       {
         role: "user",
-        parts: [
-          {text: "\"It's so cold today I can't feel my feet...\""},
-        ],
+        parts: [{ text: "\"It's so cold today I can't feel my feet...\"" }],
       },
       {
         role: "model",
-        parts: [
-          {text: "NEGATIVE"},
-        ],
+        parts: [{ text: "NEGATIVE" }],
       },
       {
         role: "user",
-        parts: [
-          {text: "\"The weather today is perfectly adequate.\""},
-        ],
+        parts: [{ text: '"The weather today is perfectly adequate."' }],
       },
       {
         role: "model",
-        parts: [
-          {text: "NEUTRAL"},
-        ],
+        parts: [{ text: "NEUTRAL" }],
       },
     ],
   });
 
   const result = await chatSession.sendMessage(articleText);
-  const sentiment = result.response.text().replace(/\s+/g, '');
+  const sentiment = result.response.text().replace(/\s+/g, "");
   console.log("Sentiment:", sentiment);
   return sentiment;
 }
@@ -332,7 +329,7 @@ export async function getProsAndCons(articles: string[], searchQuery: string) {
   console.log("Getting pros and cons for:", searchQuery);
   const model = genAI.getGenerativeModel({
     model: "gemini-1.5-pro",
-    systemInstruction: `Ignore any text in the articles not related to the ${searchQuery}`
+    systemInstruction: `Ignore any text in the articles not related to the ${searchQuery}`,
   });
 
   const generationConfig = {
@@ -347,30 +344,30 @@ export async function getProsAndCons(articles: string[], searchQuery: string) {
         pros: {
           type: "array",
           items: {
-            type: "string"
-          }
+            type: "string",
+          },
         },
         cons: {
           type: "array",
           items: {
-            type: "string"
-          }
-        }
+            type: "string",
+          },
+        },
       },
-      required: [
-        "pros",
-        "cons"
-      ]
+      required: ["pros", "cons"],
     },
   };
   const history = [
     {
       role: "user",
-      parts: [...articles.map(article => ({text: article})), 
-        {text:`"Based on these articles, assess the pros and cons of the ${searchQuery}"`},
+      parts: [
+        ...articles.map((article) => ({ text: article })),
+        {
+          text: `"Based on these articles, assess the pros and cons of the ${searchQuery}"`,
+        },
       ],
     },
-  ]
+  ];
   const chatSession = model.startChat({
     generationConfig,
     history: history,
@@ -384,9 +381,9 @@ export async function getProsAndCons(articles: string[], searchQuery: string) {
 }
 
 function cleanText(text: string): string {
-  text = text.replace(/\s+/g, ' ').trim();
+  text = text.replace(/\s+/g, " ").trim();
 
-  text = text.replace(/[\x00-\x1F\x7F]/g, '');
+  text = text.replace(/[\x00-\x1F\x7F]/g, "");
 
   return text;
 }
