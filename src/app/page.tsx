@@ -1,12 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  getSearchResults,
-  getSentimentAnalysis,
-  getArticleText,
-  getProsAndCons,
-} from "./server";
 import { SearchResult } from "@/types/searchResult";
 
 export default function Home() {
@@ -42,50 +36,58 @@ export default function Home() {
     setArticleTexts([]);
     setPros([]);
     setCons([]);
-    getSearchResults(searchQuery).then(
-      (results) => {
+
+    fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`)
+      .then((res) => res.json())
+      .then((results) => {
         setLoading(false);
         if (results.length === 0) {
           setProsAndConsLoading(false);
           return;
         }
         setSearchResults(results);
-        for (const result of results) {
-          getArticleText(result).then((text) => {
-            articleTexts.push(text);
-            getSentimentAnalysis(text, searchQuery).then(
-              (sentiment) => {
-                result.sentiment = sentiment;
-                setSearchResults([...results]);
-              },
-              (error) => {
-                console.error("Error:", error);
-              },
-            );
-            console.log(articleTexts, articleTexts.length, results.length);
-            if (articleTexts.length !== results.length) {
-              return;
-            }
 
-            getProsAndCons(articleTexts, searchQuery).then(
-              (prosAndCons) => {
-                setPros(prosAndCons.pros);
-                setCons(prosAndCons.cons);
-                setProsAndConsLoading(false);
-                console.log(prosAndCons.pros, prosAndCons.cons);
-              },
-              (error) => {
-                console.error("Error:", error);
-              },
-            );
-          });
-        }
-      },
-      (error) => {
+        results.forEach((result: SearchResult) => {
+          fetch('/api/article', {
+            method: 'POST',
+            body: JSON.stringify(result),
+          })
+            .then((res) => res.json())
+            .then(({ text }) => {
+              articleTexts.push(text);
+
+              fetch('/api/sentiment', {
+                method: 'POST',
+                body: JSON.stringify({ articleText: text, searchQuery }),
+              })
+                .then((res) => res.json())
+                .then(({ sentiment }) => {
+                  result.sentiment = sentiment;
+                  setSearchResults([...results]);
+                })
+                .catch(console.error);
+
+              if (articleTexts.length === results.length) {
+                fetch('/api/proscons', {
+                  method: 'POST',
+                  body: JSON.stringify({ articles: articleTexts, searchQuery }),
+                })
+                  .then((res) => res.json())
+                  .then((prosAndCons) => {
+                    setPros(prosAndCons.pros);
+                    setCons(prosAndCons.cons);
+                    setProsAndConsLoading(false);
+                  })
+                  .catch(console.error);
+              }
+            })
+            .catch(console.error);
+        });
+      })
+      .catch((error) => {
         console.error("Error:", error);
         setLoading(false);
-      },
-    );
+      });
   };
 
   const handleSearch = (e: React.FormEvent) => {
