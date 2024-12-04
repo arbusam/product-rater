@@ -1,6 +1,9 @@
 import { getSearchResults } from "@/app/server";
 import { NextResponse, NextRequest } from "next/server";
 import { rateLimit } from '../../lib/rateLimit'
+import exp from "constants";
+
+export const maxDuration = 15;
 
 export async function GET(req: NextRequest) {
   const rateLimitResult = await rateLimit(req);

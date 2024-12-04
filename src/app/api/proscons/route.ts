@@ -2,6 +2,8 @@ import { getProsAndCons } from "@/app/server";
 import { NextResponse, NextRequest } from "next/server";
 import { rateLimit } from '../../lib/rateLimit'
 
+export const maxDuration = 30;
+
 export async function POST(req: NextRequest) {
   const rateLimitResult = await rateLimit(req);
   if (rateLimitResult) return rateLimitResult
