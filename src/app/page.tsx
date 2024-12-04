@@ -131,7 +131,7 @@ export default function Home() {
                   onClick={() => handleExample("Samsung Galaxy S24 Ultra")}
                   className="w-full sm:w-auto px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                 >
-                  Galaxy S24 Ultra
+                  Samsung Galaxy S24 Ultra
                 </button>
                 <button
                   onClick={() => handleExample('MacBook Pro 2024 (14", M4)')}
