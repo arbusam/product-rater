@@ -234,6 +234,8 @@ export async function getSearchResults(searchQuery: string) {
       publication = "TechCrunch";
     } else if (item.displayLink.includes("tomsguide")) {
       publication = "Tom's Guide";
+    } else if (item.displayLink.includes("theverge")) {
+      publication = "The Verge";
     } else {
       publication = item.displayLink;
     }
@@ -245,7 +247,6 @@ export async function getSearchResults(searchQuery: string) {
   }
   console.log("Results:", searchResults);
 
-  // TODO: Do sentiment analysis and summary and send that to the client later
   return searchResults;
 }
 

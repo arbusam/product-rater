@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { SearchResult } from "@/types/searchResult";
+import { load } from "cheerio";
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,16 +42,16 @@ export default function Home() {
         setSearchResults(results);
 
         results.forEach((result: SearchResult) => {
-          fetch('/api/article', {
-            method: 'POST',
+          fetch("/api/article", {
+            method: "POST",
             body: JSON.stringify(result),
           })
             .then((res) => res.json())
             .then(({ text }) => {
               articleTexts.push(text);
 
-              fetch('/api/sentiment', {
-                method: 'POST',
+              fetch("/api/sentiment", {
+                method: "POST",
                 body: JSON.stringify({ articleText: text, searchQuery }),
               })
                 .then((res) => res.json())
@@ -58,11 +59,18 @@ export default function Home() {
                   result.sentiment = sentiment;
                   setSearchResults([...results]);
                 })
-                .catch(console.error);
+                .catch((error) => {
+                  if (error.response) {
+                    if (error.response.status === 429) {
+                      alert("Rate limited. Please try again later.");
+                    }
+                  }
+                  console.error(error);
+                });
 
               if (articleTexts.length === results.length) {
-                fetch('/api/proscons', {
-                  method: 'POST',
+                fetch("/api/proscons", {
+                  method: "POST",
                   body: JSON.stringify({ articles: articleTexts, searchQuery }),
                 })
                   .then((res) => res.json())
@@ -71,13 +79,32 @@ export default function Home() {
                     setCons(prosAndCons.cons);
                     setProsAndConsLoading(false);
                   })
-                  .catch(console.error);
+                  .catch((error) => {
+                    if (error.response) {
+                      if (error.response.status === 429) {
+                        alert("Rate limited. Please try again later.");
+                      }
+                    }
+                    console.error(error);
+                  });
               }
             })
-            .catch(console.error);
+            .catch((error) => {
+              if (error.response) {
+                if (error.response.status === 429) {
+                  alert("Rate limited. Please try again later.");
+                }
+              }
+              console.error(error);
+            });
         });
       })
       .catch((error) => {
+        if (error.response) {
+          if (error.response.status === 429) {
+            alert("Rate limited. Please try again later.");
+          }
+        }
         console.error("Error:", error);
         setLoading(false);
       });
@@ -96,6 +123,9 @@ export default function Home() {
   };
 
   const handleExample = (example: string) => {
+    if (loading || prosAndConsLoading) {
+      return;
+    }
     const searchInput = document.getElementById(
       "search",
     ) as HTMLInputElement | null;
@@ -155,9 +185,9 @@ export default function Home() {
                   <button
                     type="submit"
                     className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                    disabled={loading}
+                    disabled={loading || prosAndConsLoading}
                   >
-                    {loading ? (
+                    {loading || prosAndConsLoading ? (
                       <div role="status">
                         <svg
                           aria-hidden="true"
@@ -250,7 +280,7 @@ export default function Home() {
                           </tr>
                         </thead>
                         <tbody>
-                          {pros.length === 0 &&
+                          {pros != undefined && cons != undefined && pros.length === 0 &&
                           cons.length === 0 &&
                           prosAndConsLoading ? (
                             <tr>
@@ -283,16 +313,16 @@ export default function Home() {
                             <tr>
                               <td className="pr-4 align-top">
                                 <ul className="list-disc list-inside">
-                                  {pros.map((pro, index) => (
+                                  {pros != undefined ? pros.map((pro, index) => (
                                     <li key={index}>{pro}</li>
-                                  ))}
+                                  )): <div />}
                                 </ul>
                               </td>
                               <td className="pl-4 align-top">
                                 <ul className="list-disc list-inside">
-                                  {cons.map((con, index) => (
+                                  {cons != undefined ? cons.map((con, index) => (
                                     <li key={index}>{con}</li>
-                                  ))}
+                                  )): <div />}
                                 </ul>
                               </td>
                             </tr>

@@ -13,6 +13,7 @@
     "@google/generative-ai": "^0.21.0",
     "@types/cheerio": "^0.22.35",
     "@types/node-fetch": "^2.6.12",
+    "@upstash/redis": "^1.34.3",
     "cheerio": "^1.0.0",
     "natural": "^8.0.1",
     "next": "15.0.3",
