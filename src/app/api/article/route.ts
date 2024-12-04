@@ -1,4 +1,3 @@
-
 import { getArticleText } from "@/app/server";
 import { NextResponse } from "next/server";
 
@@ -8,6 +7,6 @@ export async function POST(req: Request) {
     const text = await getArticleText(article);
     return NextResponse.json({ text });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch article text" }, { status: 500 });
+    return NextResponse.json({ error: `Failed to fetch article text: ${error}` }, { status: 500 });
   }
 }

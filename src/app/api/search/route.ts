@@ -1,4 +1,3 @@
-
 import { getSearchResults } from "@/app/server";
 import { NextResponse } from "next/server";
 
@@ -14,6 +13,6 @@ export async function GET(req: Request) {
     const results = await getSearchResults(query);
     return NextResponse.json(results);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch search results" }, { status: 500 });
+    return NextResponse.json({ error: `Failed to fetch search results: ${error}` }, { status: 500 });
   }
 }

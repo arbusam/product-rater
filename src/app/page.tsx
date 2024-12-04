@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { SearchResult } from "@/types/searchResult";
 
 export default function Home() {
@@ -18,14 +18,7 @@ export default function Home() {
     document.getElementById("search")?.focus();
   }, []);
 
-  useEffect(() => {
-    if (exampleClicked && searchQuery !== "") {
-      performSearch();
-      setExampleClicked(false);
-    }
-  }, [searchQuery, exampleClicked]);
-
-  const performSearch = () => {
+  const performSearch = useCallback(() => {
     if (searchQuery === "") {
       return;
     }
@@ -88,7 +81,14 @@ export default function Home() {
         console.error("Error:", error);
         setLoading(false);
       });
-  };
+  }, [searchQuery, articleTexts]);
+
+  useEffect(() => {
+    if (exampleClicked && searchQuery !== "") {
+      performSearch();
+      setExampleClicked(false);
+    }
+  }, [searchQuery, exampleClicked, performSearch]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,7 +118,7 @@ export default function Home() {
               <h2 className="text-lg text-center mb-4">
                 Analyses tech products by summarising online reviews. If this is
                 your first time using this, you can start with one of these
-                examples.
+                examples. For best results, be as specific as possible.
               </h2>
               <div className="flex flex-col sm:flex-row justify-center gap-2 mt-4">
                 <button
