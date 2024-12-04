@@ -46,6 +46,7 @@ export default function Home() {
       (results) => {
         setLoading(false);
         if (results.length === 0) {
+          setProsAndConsLoading(false);
           return;
         }
         setSearchResults(results);
@@ -117,22 +118,22 @@ export default function Home() {
                 your first time using this, you can start with one of these
                 examples.
               </h2>
-              <div className="flex justify-center gap-2 mt-4">
+              <div className="flex flex-col sm:flex-row justify-center gap-2 mt-4">
                 <button
                   onClick={() => handleExample("iPhone 16")}
-                  className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  className="w-full sm:w-auto px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                 >
                   iPhone 16
                 </button>
                 <button
                   onClick={() => handleExample("Samsung Galaxy S24 Ultra")}
-                  className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  className="w-full sm:w-auto px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                 >
-                  Samsung Galaxy S24 Ultra
+                  Galaxy S24 Ultra
                 </button>
                 <button
                   onClick={() => handleExample('MacBook Pro 2024 (14", M4)')}
-                  className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                  className="w-full sm:w-auto px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                 >
                   MacBook Pro 2024
                 </button>
@@ -236,56 +237,68 @@ export default function Home() {
                     )}
                   </h2>
                   <div className="mt-6" />
-                  <h2 className="text-xl font-bold mt-8">Pros and Cons:</h2>
-                  <table className="table-fixed w-full mt-2 text-left">
-                    <thead>
-                      <tr>
-                        <th className="text-left text-lg">Pros</th>
-                        <th className="text-left text-lg pl-4">Cons</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {pros.length === 0 && cons.length === 0 && prosAndConsLoading ? (
-                        <tr>
-                          <td className="align-top">
-                            <ul className="list-disc list-inside">
-                              <div role="status" className="max-w-sm animate-pulse">
-                                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
-                                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
-                                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
-                              </div>
-                            </ul>
-                          </td>
-                          <td className="align-top">
-                            <ul className="list-disc list-inside">
-                              <div role="status" className="max-w-sm animate-pulse">
-                                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
-                                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
-                                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
-                              </div>
-                            </ul>
-                          </td>
-                        </tr>
-                      ) : (
-                        <tr>
-                          <td className="pr-4 align-top">
-                            <ul className="list-disc list-inside">
-                              {pros.map((pro, index) => (
-                                <li key={index}>{pro}</li>
-                              ))}
-                            </ul>
-                          </td>
-                          <td className="pl-4 align-top">
-                            <ul className="list-disc list-inside">
-                              {cons.map((con, index) => (
-                                <li key={index}>{con}</li>
-                              ))}
-                            </ul>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+                  {searchResults.length > 0 && (
+                    <div>
+                      <h2 className="text-xl font-bold mt-8">Pros and Cons:</h2>
+                      <table className="table-fixed w-full mt-2 text-left">
+                        <thead>
+                          <tr>
+                            <th className="text-left text-lg">Pros</th>
+                            <th className="text-left text-lg pl-4">Cons</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {pros.length === 0 &&
+                          cons.length === 0 &&
+                          prosAndConsLoading ? (
+                            <tr>
+                              <td className="align-top">
+                                <ul className="list-disc list-inside">
+                                  <div
+                                    role="status"
+                                    className="max-w-sm animate-pulse"
+                                  >
+                                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
+                                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
+                                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
+                                  </div>
+                                </ul>
+                              </td>
+                              <td className="align-top">
+                                <ul className="list-disc list-inside">
+                                  <div
+                                    role="status"
+                                    className="max-w-sm animate-pulse"
+                                  >
+                                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
+                                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
+                                    <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[250px] mb-2.5"></div>
+                                  </div>
+                                </ul>
+                              </td>
+                            </tr>
+                          ) : (
+                            <tr>
+                              <td className="pr-4 align-top">
+                                <ul className="list-disc list-inside">
+                                  {pros.map((pro, index) => (
+                                    <li key={index}>{pro}</li>
+                                  ))}
+                                </ul>
+                              </td>
+                              <td className="pl-4 align-top">
+                                <ul className="list-disc list-inside">
+                                  {cons.map((con, index) => (
+                                    <li key={index}>{con}</li>
+                                  ))}
+                                </ul>
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
