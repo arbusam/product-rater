@@ -13,7 +13,7 @@ export default function Home() {
   const [cons, setCons] = useState<string[]>([]);
   const [searched, setSearched] = useState(false);
   const [exampleClicked, setExampleClicked] = useState(false);
-  
+
   useEffect(() => {
     if (window.innerWidth >= 1024) {
       document.getElementById("search")?.focus();
@@ -285,7 +285,7 @@ export default function Home() {
                           cons.length === 0 &&
                           prosAndConsLoading ? (
                             <tr>
-                              <td className="align-top">
+                              <td className="pr-4 align-top">
                                 <ul className="list-disc list-inside">
                                   <div
                                     role="status"
@@ -297,7 +297,7 @@ export default function Home() {
                                   </div>
                                 </ul>
                               </td>
-                              <td className="align-top">
+                              <td className="pl-4 align-top">
                                 <ul className="list-disc list-inside">
                                   <div
                                     role="status"
