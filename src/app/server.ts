@@ -25,10 +25,10 @@ const contentSelectors = [
 
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 
-if (!process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
+if (!process.env.GEMINI_API_KEY) {
   throw new Error("GEMINI_API_KEY is not defined");
 }
-const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const context = [
   {
@@ -176,7 +176,7 @@ export async function getSearchResults(searchQuery: string) {
   searchResults = [];
   console.log("Searching for:", searchQuery);
   const response = await fetch(
-    `https://www.googleapis.com/customsearch/v1?q=${searchQuery + ' "review"'}&cx=${process.env.NEXT_PUBLIC_PSE_CX}&key=${process.env.NEXT_PUBLIC_PSE_API_KEY}`,
+    `https://www.googleapis.com/customsearch/v1?q=${searchQuery + ' "review"'}&cx=${process.env.PSE_CX}&key=${process.env.PSE_API_KEY}`,
   );
   const results = await response.json();
   if (!results.items) {
