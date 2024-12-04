@@ -13,9 +13,11 @@ export default function Home() {
   const [cons, setCons] = useState<string[]>([]);
   const [searched, setSearched] = useState(false);
   const [exampleClicked, setExampleClicked] = useState(false);
-
+  
   useEffect(() => {
-    document.getElementById("search")?.focus();
+    if (window.innerWidth >= 1024) {
+      document.getElementById("search")?.focus();
+    }
   }, []);
 
   const performSearch = useCallback(() => {
