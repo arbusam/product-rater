@@ -328,7 +328,7 @@ export async function getSentimentAnalysis(
 export async function getProsAndCons(articles: string[], searchQuery: string) {
   console.log("Getting pros and cons for:", searchQuery);
   const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-pro",
+    model: "gemini-1.5-flash",
     systemInstruction: `Ignore any text in the articles not related to the ${searchQuery}`,
   });
 
