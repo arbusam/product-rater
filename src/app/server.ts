@@ -191,7 +191,7 @@ export async function getSearchResults(searchQuery: string) {
     }
     // Ask Gemini if each result is about the product
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash-8b",
+      model: "gemini-2.0-flash-lite-preview-02-05",
     });
     const generationConfig = {
       temperature: 0,
@@ -274,7 +274,7 @@ export async function getSentimentAnalysis(
   searchQuery: string,
 ) {
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash-lite",
+    model: "gemini-2.0-flash-lite-preview-02-05",
     systemInstruction: `Ignore any text in the articles not related to the ${searchQuery}`,
   });
 
@@ -328,7 +328,7 @@ export async function getSentimentAnalysis(
 export async function getProsAndCons(articles: string[], searchQuery: string) {
   console.log("Getting pros and cons for:", searchQuery);
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.0-flash-lite",
+    model: "gemini-2.0-flash-lite-preview-02-05",
     systemInstruction: `Ignore any text in the articles not related to the ${searchQuery}`,
   });
 
