@@ -14,6 +14,13 @@ export default function Home() {
   const [searched, setSearched] = useState(false);
   const [exampleClicked, setExampleClicked] = useState(false);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleRateLimit = (error: any) => {
+    if (error.response && error.response.status === 429) {
+      alert("Rate limited. Please try again later.");
+    }
+  };
+
   useEffect(() => {
     if (window.innerWidth >= 1024) {
       document.getElementById("search")?.focus();
@@ -61,11 +68,7 @@ export default function Home() {
                   setSearchResults([...results]);
                 })
                 .catch((error) => {
-                  if (error.response) {
-                    if (error.response.status === 429) {
-                      alert("Rate limited. Please try again later.");
-                    }
-                  }
+                  handleRateLimit(error);
                   console.error(error);
                 });
 
@@ -81,31 +84,19 @@ export default function Home() {
                     setProsAndConsLoading(false);
                   })
                   .catch((error) => {
-                    if (error.response) {
-                      if (error.response.status === 429) {
-                        alert("Rate limited. Please try again later.");
-                      }
-                    }
+                    handleRateLimit(error);
                     console.error(error);
                   });
               }
             })
             .catch((error) => {
-              if (error.response) {
-                if (error.response.status === 429) {
-                  alert("Rate limited. Please try again later.");
-                }
-              }
+              handleRateLimit(error);
               console.error(error);
             });
         });
       })
       .catch((error) => {
-        if (error.response) {
-          if (error.response.status === 429) {
-            alert("Rate limited. Please try again later.");
-          }
-        }
+        handleRateLimit(error);
         console.error("Error:", error);
         setLoading(false);
       });
