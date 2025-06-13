@@ -172,8 +172,7 @@ const context = [
 ];
 
 export async function getSearchResults(searchQuery: string) {
-  let searchResults: SearchResult[] = [];
-  searchResults = [];
+  const searchResults: SearchResult[] = [];
   console.log("Searching for:", searchQuery);
   const response = await fetch(
     `https://www.googleapis.com/customsearch/v1?q=${searchQuery + ' "review"'}&cx=${process.env.PSE_CX}&key=${process.env.PSE_API_KEY}`,
