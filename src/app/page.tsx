@@ -2,15 +2,16 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { SearchResult } from "@/types/searchResult";
+import { ProConItem } from "@/types/proConItem";
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [prosAndConsLoading, setProsAndConsLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [articleTexts, setArticleTexts] = useState<string[]>([]);
-  const [pros, setPros] = useState<string[]>([]);
-  const [cons, setCons] = useState<string[]>([]);
+  const [articleTexts, setArticleTexts] = useState<{ id: number; text: string }[]>([]);
+  const [pros, setPros] = useState<ProConItem[]>([]);
+  const [cons, setCons] = useState<ProConItem[]>([]);
   const [searched, setSearched] = useState(false);
   const [exampleClicked, setExampleClicked] = useState(false);
 
@@ -34,12 +35,15 @@ export default function Home() {
 
     fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`)
       .then((res) => res.json())
-      .then((results) => {
+      .then((results: SearchResult[]) => {
         setLoading(false);
         if (results.length === 0) {
           setProsAndConsLoading(false);
           return;
         }
+        results.forEach((result: SearchResult, idx: number) => {
+          result.id = idx + 1;
+        });
         setSearchResults(results);
 
         results.forEach((result: SearchResult) => {
@@ -48,8 +52,9 @@ export default function Home() {
             body: JSON.stringify(result),
           })
             .then((res) => res.json())
-            .then(({ text }) => {
-              articleTexts.push(text);
+            .then(({ id, text }) => {
+              articleTexts.push({ id, text });
+              setArticleTexts([...articleTexts]);
 
               fetch("/api/sentiment", {
                 method: "POST",
@@ -221,7 +226,7 @@ export default function Home() {
                   <h2 className="text-base font-semibold mt-8">
                     Reviews from:{" "}
                     {searchResults.length > 0 ? (
-                      <ul className="list-disc list-inside">
+                      <ol className="list-decimal list-inside">
                         {searchResults.map((result) => (
                           <li key={result.link}>
                             <a
@@ -259,7 +264,7 @@ export default function Home() {
                             )}
                           </li>
                         ))}
-                      </ul>
+                      </ol>
                     ) : loading ? (
                       <div role="status" className="max-w-sm animate-pulse">
                         <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-24 mb-4"></div>
@@ -314,16 +319,52 @@ export default function Home() {
                             <tr>
                               <td className="pr-4 align-top">
                                 <ul className="list-disc list-inside">
-                                  {pros != undefined ? pros.map((pro, index) => (
-                                    <li key={index}>{pro}</li>
-                                  )): <div />}
+                                  {pros != undefined
+                                    ? pros.map((pro, index) => (
+                                        <li key={index}>
+                                          {pro.text}
+                                          {pro.ids.map((id) => {
+                                            const res = searchResults.find((r) => r.id === id);
+                                            return res ? (
+                                              <a
+                                                key={id}
+                                                href={res.link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-500 hover:underline ml-1"
+                                              >
+                                                [{id}]
+                                              </a>
+                                            ) : null;
+                                          })}
+                                        </li>
+                                      ))
+                                    : <div />}
                                 </ul>
                               </td>
                               <td className="pl-4 align-top">
                                 <ul className="list-disc list-inside">
-                                  {cons != undefined ? cons.map((con, index) => (
-                                    <li key={index}>{con}</li>
-                                  )): <div />}
+                                  {cons != undefined
+                                    ? cons.map((con, index) => (
+                                        <li key={index}>
+                                          {con.text}
+                                          {con.ids.map((id) => {
+                                            const res = searchResults.find((r) => r.id === id);
+                                            return res ? (
+                                              <a
+                                                key={id}
+                                                href={res.link}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-500 hover:underline ml-1"
+                                              >
+                                                [{id}]
+                                              </a>
+                                            ) : null;
+                                          })}
+                                        </li>
+                                      ))
+                                    : <div />}
                                 </ul>
                               </td>
                             </tr>
