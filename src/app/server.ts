@@ -28,6 +28,18 @@ import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 if (!process.env.GEMINI_API_KEY) {
   throw new Error("GEMINI_API_KEY is not defined");
 }
+if (!process.env.PSE_API_KEY) {
+  throw new Error("PSE_API_KEY is not defined");
+}
+if (!process.env.PSE_CX) {
+  throw new Error("PSE_CX is not defined");
+}
+if (!process.env.UPSTASH_REDIS_REST_TOKEN) {
+  throw new Error("UPSTASH_REDIS_REST_TOKEN is not defined");
+}
+if (!process.env.UPSTASH_REDIS_REST_URL) {
+  throw new Error("UPSTASH_REDIS_REST_URL is not defined");
+}
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const context = [
