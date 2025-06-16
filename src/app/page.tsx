@@ -165,13 +165,13 @@ export default function Home() {
               <div className="mt-6" />
               <form onSubmit={handleSearch} className="w-full">
                 <div className="flex gap-2">
-                  {/* TODO: Limit character length */}
                   <input
                     id="search"
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Enter a tech product"
+                    maxLength={100}
                     className="flex-1 px-4 py-2 rounded-lg border bg-gray-50 border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   />
                   <button
