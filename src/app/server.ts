@@ -14,6 +14,19 @@ const excludeSelectors = [
   ".sidebar",
 ];
 
+const publicationMap: Record<string, string> = {
+  wired: "Wired",
+  engadget: "Engadget",
+  techradar: "TechRadar",
+  gizmodo: "Gizmodo",
+  zdnet: "ZDNet",
+  cnet: "CNET",
+  digitaltrends: "Digital Trends",
+  techcrunch: "TechCrunch",
+  tomsguide: "Tom's Guide",
+  theverge: "The Verge",
+};
+
 const contentSelectors = [
   "article",
   "main",
@@ -227,32 +240,12 @@ export async function getSearchResults(searchQuery: string) {
       continue;
     }
 
-    let publication;
-    if (item.displayLink.includes("wired")) {
-      publication = "Wired";
-    } else if (item.displayLink.includes("engadget")) {
-      publication = "Engadget";
-    } else if (item.displayLink.includes("techradar")) {
-      publication = "TechRadar";
-    } else if (item.displayLink.includes("gizmodo")) {
-      publication = "Gizmodo";
-    } else if (item.displayLink.includes("zdnet")) {
-      publication = "ZDNet";
-    } else if (item.displayLink.includes("cnet")) {
-      publication = "CNET";
-    } else if (item.displayLink.includes("digitaltrends")) {
-      publication = "Digital Trends";
-    } else if (item.displayLink.includes("techcrunch")) {
-      publication = "TechCrunch";
-    } else if (item.displayLink.includes("tomsguide")) {
-      publication = "Tom's Guide";
-    } else if (item.displayLink.includes("theverge")) {
-      publication = "The Verge";
-    } else {
-      publication = item.displayLink;
-    }
+    const publication =
+      Object.entries(publicationMap).find(([key]) =>
+        item.displayLink.includes(key),
+      )?.[1] ?? item.displayLink;
     searchResults.push({
-      publication: publication,
+      publication,
       title: item.title,
       link: item.link,
     });
