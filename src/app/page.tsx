@@ -156,10 +156,10 @@ export default function Home() {
                   Samsung Galaxy S25 Ultra
                 </button>
                 <button
-                  onClick={() => handleExample('MacBook Pro 2024 (14", M4)')}
+                  onClick={() => handleExample("Steam Deck OLED")}
                   className="w-full sm:w-auto px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                 >
-                  MacBook Pro 2024
+                  Steam Deck OLED
                 </button>
               </div>
               <div className="mt-6" />
