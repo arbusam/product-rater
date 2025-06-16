@@ -25,6 +25,13 @@ const contentSelectors = [
 
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 
+const DEBUG = process.env.DEBUG === "true";
+function debugLog(...args: unknown[]) {
+  if (DEBUG) {
+    console.log(...args);
+  }
+}
+
 if (!process.env.GEMINI_API_KEY) {
   throw new Error("GEMINI_API_KEY is not defined");
 }
@@ -174,7 +181,7 @@ const context = [
 export async function getSearchResults(searchQuery: string) {
   let searchResults: SearchResult[] = [];
   searchResults = [];
-  console.log("Searching for:", searchQuery);
+  debugLog("Searching for:", searchQuery);
   const response = await fetch(
     `https://www.googleapis.com/customsearch/v1?q=${searchQuery + ' "review"'}&cx=${process.env.PSE_CX}&key=${process.env.PSE_API_KEY}`,
   );
@@ -245,7 +252,7 @@ export async function getSearchResults(searchQuery: string) {
       link: item.link,
     });
   }
-  console.log("Results:", searchResults);
+  debugLog("Results:", searchResults);
 
   return searchResults;
 }
@@ -321,12 +328,12 @@ export async function getSentimentAnalysis(
 
   const result = await chatSession.sendMessage(articleText);
   const sentiment = result.response.text().replace(/\s+/g, "");
-  console.log("Sentiment:", sentiment);
+  debugLog("Sentiment:", sentiment);
   return sentiment;
 }
 
 export async function getProsAndCons(articles: string[], searchQuery: string) {
-  console.log("Getting pros and cons for:", searchQuery);
+  debugLog("Getting pros and cons for:", searchQuery);
   const model = genAI.getGenerativeModel({
     model: "gemini-2.0-flash-lite-preview-02-05",
     systemInstruction: `Ignore any text in the articles not related to the ${searchQuery}`,
@@ -374,7 +381,7 @@ export async function getProsAndCons(articles: string[], searchQuery: string) {
   });
 
   const result = await chatSession.sendMessage("");
-  console.log("Pros and Cons:", result.response.text());
+  debugLog("Pros and Cons:", result.response.text());
   const text = result.response.text();
   const json = JSON.parse(text);
   return json;

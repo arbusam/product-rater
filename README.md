@@ -19,4 +19,5 @@ If you wish to run this on your own computer, follow these steps:
 8. Create an Upstash account: https://upstash.com/
 9. Create a new Redis database
 10. Copy the Redis URL and token and paste it into the .env file.
-11. Run `npm run dev`
+11. (Optional) Set `DEBUG=true` in your .env file to enable debug logging.
+12. Run `npm run dev`

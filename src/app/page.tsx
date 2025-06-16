@@ -217,7 +217,6 @@ export default function Home() {
               </form>
               {searched && (
                 <div>
-                  {/* TODO: Add Skeleton Loader */}
                   <h2 className="text-base font-semibold mt-8">
                     Reviews from:{" "}
                     {searchResults.length > 0 ? (
