@@ -289,44 +289,50 @@ export async function getSentimentAnalysis(
     maxOutputTokens: 2,
     responseMimeType: "text/plain",
   };
+  const history = [
+    {
+      role: "user",
+      parts: [
+        {
+          text: 'Analyze the sentiment of the following text and classify them as POSITIVE, NEGATIVE, or NEUTRAL. Always respond with one word only. "It\'s so beautiful today!"',
+        },
+      ],
+    },
+    {
+      role: "model",
+      parts: [{ text: "POSITIVE" }],
+    },
+    {
+      role: "user",
+      parts: [{ text: "\"It's so cold today I can't feel my feet...\"" }],
+    },
+    {
+      role: "model",
+      parts: [{ text: "NEGATIVE" }],
+    },
+    {
+      role: "user",
+      parts: [{ text: '"The weather today is perfectly adequate."' }],
+    },
+    {
+      role: "model",
+      parts: [{ text: "NEUTRAL" }],
+    },
+  ];
+
   const chatSession = model.startChat({
     generationConfig,
-    history: [
-      {
-        role: "user",
-        parts: [
-          {
-            text: 'Analyze the sentiment of the following text and classify them as POSITIVE, NEGATIVE, or NEUTRAL. Always respond with one word only. "It\'s so beautiful today!"',
-          },
-        ],
-      },
-      {
-        role: "model",
-        parts: [{ text: "POSITIVE" }],
-      },
-      {
-        role: "user",
-        parts: [{ text: "\"It's so cold today I can't feel my feet...\"" }],
-      },
-      {
-        role: "model",
-        parts: [{ text: "NEGATIVE" }],
-      },
-      {
-        role: "user",
-        parts: [{ text: '"The weather today is perfectly adequate."' }],
-      },
-      {
-        role: "model",
-        parts: [{ text: "NEUTRAL" }],
-      },
-    ],
+    history,
   });
 
   const result = await chatSession.sendMessage(articleText);
-  const sentiment = result.response.text().replace(/\s+/g, "");
+  const sentiment = result.response.text().replace(/\s+/g, "").toUpperCase();
   console.log("Sentiment:", sentiment);
-  return sentiment;
+  if (sentiment === "POSITIVE" || sentiment === "NEGATIVE" || sentiment === "NEUTRAL") {
+    return sentiment;
+  }
+
+  return "ERROR";
 }
 
 export async function getProsAndCons(articles: string[], searchQuery: string) {
