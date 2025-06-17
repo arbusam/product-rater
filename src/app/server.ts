@@ -316,18 +316,16 @@ export async function getSentimentAnalysis(
     },
   ];
 
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const chatSession = model.startChat({
-      generationConfig,
-      history,
-    });
+  const chatSession = model.startChat({
+    generationConfig,
+    history,
+  });
 
-    const result = await chatSession.sendMessage(articleText);
-    const sentiment = result.response.text().replace(/\s+/g, "").toUpperCase();
-    console.log("Sentiment:", sentiment);
-    if (sentiment === "POSITIVE" || sentiment === "NEGATIVE" || sentiment === "NEUTRAL") {
-      return sentiment;
-    }
+  const result = await chatSession.sendMessage(articleText);
+  const sentiment = result.response.text().replace(/\s+/g, "").toUpperCase();
+  console.log("Sentiment:", sentiment);
+  if (sentiment === "POSITIVE" || sentiment === "NEGATIVE" || sentiment === "NEUTRAL") {
+    return sentiment;
   }
 
   return "ERROR";
