@@ -38,22 +38,21 @@ const contentSelectors = [
 
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 
-if (!process.env.GEMINI_API_KEY) {
-  throw new Error("GEMINI_API_KEY is not defined");
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`${name} is not defined`);
+  }
+  return value;
 }
-if (!process.env.PSE_API_KEY) {
-  throw new Error("PSE_API_KEY is not defined");
+
+let genAI: GoogleGenerativeAI | undefined;
+function getGenAI(): GoogleGenerativeAI {
+  if (!genAI) {
+    genAI = new GoogleGenerativeAI(requireEnv("GEMINI_API_KEY"));
+  }
+  return genAI;
 }
-if (!process.env.PSE_CX) {
-  throw new Error("PSE_CX is not defined");
-}
-if (!process.env.UPSTASH_REDIS_REST_TOKEN) {
-  throw new Error("UPSTASH_REDIS_REST_TOKEN is not defined");
-}
-if (!process.env.UPSTASH_REDIS_REST_URL) {
-  throw new Error("UPSTASH_REDIS_REST_URL is not defined");
-}
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const context = [
   {
@@ -199,8 +198,10 @@ const context = [
 export async function getSearchResults(searchQuery: string) {
   const searchResults: SearchResult[] = [];
   console.log("Searching for:", searchQuery);
+  const pseCx = requireEnv("PSE_CX");
+  const pseApiKey = requireEnv("PSE_API_KEY");
   const response = await fetch(
-    `https://www.googleapis.com/customsearch/v1?q=${searchQuery + ' "review"'}&cx=${process.env.PSE_CX}&key=${process.env.PSE_API_KEY}`,
+    `https://www.googleapis.com/customsearch/v1?q=${searchQuery + ' "review"'}&cx=${pseCx}&key=${pseApiKey}`,
   );
   const results = await response.json();
   if (!results.items) {
@@ -214,7 +215,7 @@ export async function getSearchResults(searchQuery: string) {
       continue;
     }
     // Ask Gemini if each result is about the product
-    const model = genAI.getGenerativeModel({
+    const model = getGenAI().getGenerativeModel({
       model: "gemini-2.0-flash-lite-preview-02-05",
     });
     const generationConfig = {
@@ -277,7 +278,7 @@ export async function getSentimentAnalysis(
   articleText: string,
   searchQuery: string,
 ) {
-  const model = genAI.getGenerativeModel({
+  const model = getGenAI().getGenerativeModel({
     model: "gemini-2.0-flash-lite-preview-02-05",
     systemInstruction: `Ignore any text in the articles not related to the ${searchQuery}`,
   });
@@ -331,7 +332,7 @@ export async function getSentimentAnalysis(
 
 export async function getProsAndCons(articles: string[], searchQuery: string) {
   console.log("Getting pros and cons for:", searchQuery);
-  const model = genAI.getGenerativeModel({
+  const model = getGenAI().getGenerativeModel({
     model: "gemini-2.0-flash-lite-preview-02-05",
     systemInstruction: `Ignore any text in the articles not related to the ${searchQuery}`,
   });
