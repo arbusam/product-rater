@@ -329,7 +329,10 @@ export async function getSentimentAnalysis(
   return sentiment;
 }
 
-export async function getProsAndCons(articles: string[], searchQuery: string) {
+export async function getProsAndCons(
+  articles: { id: number; text: string }[],
+  searchQuery: string,
+) {
   console.log("Getting pros and cons for:", searchQuery);
   const model = genAI.getGenerativeModel({
     model: "gemini-2.0-flash-lite-preview-02-05",
@@ -348,13 +351,29 @@ export async function getProsAndCons(articles: string[], searchQuery: string) {
         pros: {
           type: SchemaType.ARRAY,
           items: {
-            type: SchemaType.STRING,
+            type: SchemaType.OBJECT,
+            properties: {
+              text: { type: SchemaType.STRING },
+              ids: {
+                type: SchemaType.ARRAY,
+                items: { type: SchemaType.INTEGER },
+              },
+            },
+            required: ["text", "ids"],
           },
         },
         cons: {
           type: SchemaType.ARRAY,
           items: {
-            type: SchemaType.STRING,
+            type: SchemaType.OBJECT,
+            properties: {
+              text: { type: SchemaType.STRING },
+              ids: {
+                type: SchemaType.ARRAY,
+                items: { type: SchemaType.INTEGER },
+              },
+            },
+            required: ["text", "ids"],
           },
         },
       },
@@ -365,9 +384,10 @@ export async function getProsAndCons(articles: string[], searchQuery: string) {
     {
       role: "user",
       parts: [
-        ...articles.map((article) => ({ text: article })),
+        ...articles.map((article) => ({ text: `Review ${article.id}: ${article.text}` })),
         {
-          text: `"Based on these articles, assess the pros and cons of the ${searchQuery}"`,
+          text: `Based on these reviews, assess the pros and cons of the ${searchQuery}. ` +
+            "Respond in JSON with 'pros' and 'cons' arrays. Each item should have 'text' and 'ids' fields where 'ids' is an array of review IDs."
         },
       ],
     },
